@@ -156,6 +156,21 @@ function playNextVideo() {
 playNextVideo();
 
 
+        // Pedestal with papers next to the central image
+        const pedestalGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
+        const pedestalMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+        const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
+        pedestal.position.set(3, 1.5, -9.5);  // Adjust position as needed
+        scene.add(pedestal);
+
+        // Adding papers on top of the pedestal
+        const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
+        const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+        paper.position.set(3, 3, -9.5);
+        paper.rotation.x = -Math.PI / 2;
+        scene.add(paper);
+
 
         // Rotating objects in corners
         const cornerPositions = [
