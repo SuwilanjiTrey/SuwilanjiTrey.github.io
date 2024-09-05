@@ -96,29 +96,32 @@
         scene.add(ceiling);
 
         // Pictures on walls
+        // Pictures on walls
         const textureLoader = new THREE.TextureLoader();
         const pictureData = [
             { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },
-            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'gif', file: '1.gif' },
-            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'gif', file: '2.gif' },
-            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'gif', file: '2.gif' }
+            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
+            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
+            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
         ];
+
+        const videoTextures = [];
 
         pictureData.forEach((pic) => {
             let material;
             
-            if (pic.type === 'image' || pic.type === 'gif') {
+            if (pic.type === 'image') {
                 const texture = textureLoader.load(`images/${pic.file}`);
-                
-                if (pic.type === 'gif') {
-                    // Set up GIF texture for smooth animation
-                    texture.minFilter = THREE.LinearFilter;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.generateMipmaps = false;
-                    texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-                }
-                
-                material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+                material = new THREE.MeshBasicMaterial({ map: texture });
+            } else if (pic.type === 'video') {
+                const video = document.getElementById(pic.element);
+                video.play(); // Start playing the video
+                const videoTexture = new THREE.VideoTexture(video);
+                videoTexture.minFilter = THREE.LinearFilter;
+                videoTexture.magFilter = THREE.LinearFilter;
+                videoTexture.format = THREE.RGBFormat;
+                material = new THREE.MeshBasicMaterial({ map: videoTexture });
+                videoTextures.push(videoTexture);
             }
             
             const picture = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), material);
@@ -246,9 +249,9 @@
             });
             
                         // Update video textures
-            //videoTextures.forEach(texture => {
-            //    texture.needsUpdate = true;
-            //});
+            videoTextures.forEach(texture => {
+                texture.needsUpdate = true;
+            });
 
 
             // Smooth camera rotation
