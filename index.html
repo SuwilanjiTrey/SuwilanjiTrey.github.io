@@ -1,54 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Museum Portfolio</title>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        #info {
-            position: absolute;
-            top: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-        #interactButton {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: none;
-        }
-        video {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div id="info">Use arrow keys to move. Click and drag to look around.</div>
-        <!-- Add video elements -->
-        <video id="gif1" muted>
-            <source src="images/androidmini.mp4" type="video/mp4">
-        </video>
-        <video id="gif2" muted>
-            <source src="images/Py-GAME.mp4" type="video/mp4">
-        </video>
-        <video id="gif3" muted>
-            <source src="images/androidmini.mp4" type="video/mp4">
-        </video>
-
-    <button id="interactButton">Interact (E)</button>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <script>
+<script>
         // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -95,16 +45,19 @@
         ceiling.rotation.x = Math.PI / 2;
         scene.add(ceiling);
 
-        // Pictures on walls
-const textureLoader = new THREE.TextureLoader();
-const pictureData = [
-{ position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'carousel', files: ['central.png', '2.gif', '3.jpg'] },
-    { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
-    { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
-    { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
-];
+        // Adjusted width for images and videos on walls
+        const imageGeometry = new THREE.PlaneGeometry(5, 3);  // Adjust the size here (5 units wide, 3 units tall)
 
-const videoTextures = [];
+        // Pictures on walls
+        const textureLoader = new THREE.TextureLoader();
+        const pictureData = [
+            { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'carousel', files: ['img1.png', 'img2.png', 'img3.png'] },
+            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
+            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
+            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
+        ];
+
+        const videoTextures = [];
         let carouselIndex = 0;
 
         pictureData.forEach((pic, index) => {
@@ -123,38 +76,21 @@ const videoTextures = [];
                     });
                 }, 3000); // Change every 3 seconds
             } else if (pic.type === 'video') {
-        const video = document.getElementById(pic.element);
-        videoTextures.push({ video, index });
-        const videoTexture = new THREE.VideoTexture(video);
-        videoTexture.minFilter = THREE.LinearFilter;
-        videoTexture.magFilter = THREE.LinearFilter;
-        videoTexture.format = THREE.RGBFormat;
-        material = new THREE.MeshBasicMaterial({ map: videoTexture });
-    }
-    
-    const picture = new THREE.Mesh(new THREE.PlaneGeometry(5, 3), material);
-    picture.position.set(...pic.position);
-    picture.rotation.set(...pic.rotation);
-    scene.add(picture);
-});
-
-
-
-function playNextVideo() {
-    if (videoTextures.length === 0) return;
-
-    const { video, index } = videoTextures[currentVideoIndex];
-    
-    video.play();
-    video.onended = () => {
-        video.pause(); // Pause the current video
-        currentVideoIndex = (currentVideoIndex + 1) % videoTextures.length; // Move to the next video
-        playNextVideo(); // Play the next video
-    };
-}
-
-// Start playing the first video
-playNextVideo();
+                const video = document.getElementById(pic.element);
+                video.play(); // Start playing the video
+                const videoTexture = new THREE.VideoTexture(video);
+                videoTexture.minFilter = THREE.LinearFilter;
+                videoTexture.magFilter = THREE.LinearFilter;
+                videoTexture.format = THREE.RGBFormat;
+                material = new THREE.MeshBasicMaterial({ map: videoTexture });
+                videoTextures.push(videoTexture);
+            }
+            
+            const picture = new THREE.Mesh(imageGeometry, material);
+            picture.position.set(...pic.position);
+            picture.rotation.set(...pic.rotation);
+            scene.add(picture);
+        });
 
         // Pedestal with papers next to the central image
         const pedestalGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
@@ -170,23 +106,6 @@ playNextVideo();
         paper.position.set(3, 3, -9.5);
         paper.rotation.x = -Math.PI / 2;
         scene.add(paper);
-
-        // Rotating objects in corners
-        const cornerPositions = [
-            [-9, 1, -9],
-            [9, 1, -9],
-            [-9, 1, 9],
-            [9, 1, 9]
-        ];
-
-        const rotatingObjects = cornerPositions.map((position, index) => {
-            const geometry = index % 2 === 0 ? new THREE.BoxGeometry(1, 1, 1) : new THREE.TetrahedronGeometry(0.7);
-            const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
-            const object = new THREE.Mesh(geometry, material);
-            object.position.set(...position);
-            scene.add(object);
-            return object;
-        });
 
         // Camera setup
         camera.position.set(0, 4, 0);
@@ -207,7 +126,7 @@ playNextVideo();
 
         function checkIntersections() {
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects([...rotatingObjects, ...scene.children]);
+            const intersects = raycaster.intersectObjects([...scene.children]);
             
             if (intersects.length > 0) {
                 intersectedObject = intersects[0].object;
@@ -251,31 +170,39 @@ playNextVideo();
 
         document.getElementById('interactButton').addEventListener('click', interact);
 
-        // Mouse events for looking around
         document.addEventListener('mousedown', (event) => {
             isMouseDown = true;
             mouseX = event.clientX;
             mouseY = event.clientY;
         });
 
-        document.addEventListener('mouseup', () => {
-            isMouseDown = false;
-        });
-
         document.addEventListener('mousemove', (event) => {
             if (isMouseDown) {
-                const deltaX = event.clientX - mouseX;
-                const deltaY = event.clientY - mouseY;
+                const movementX = event.clientX - mouseX;
+                const movementY = event.clientY - mouseY;
+
+                targetRotationX += movementX * sensitivity;
+                targetRotationY += movementY * sensitivity;
 
                 mouseX = event.clientX;
                 mouseY = event.clientY;
 
-                targetRotationY -= deltaX * sensitivity;
-                targetRotationX -= deltaY * sensitivity;
+                camera.rotation.y -= targetRotationX;
+                camera.rotation.x -= targetRotationY;
 
-                // Limit vertical rotation
-                targetRotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, targetRotationX));
+                targetRotationX *= 0.9;
+                targetRotationY *= 0.9;
             }
+
+            // Update mouse coordinates for raycasting
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            checkIntersections();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isMouseDown = false;
         });
 
         // Animation
