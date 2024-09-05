@@ -35,7 +35,6 @@
 <body>
     <div id="info">Use arrow keys to move. Click and drag to look around.</div>
         <!-- Add video elements -->
-        <!-- Add video elements -->
         <video id="gif1" muted>
             <source src="images/androidmini.mp4" type="video/mp4">
         </video>
@@ -45,7 +44,6 @@
         <video id="gif3" muted>
             <source src="images/androidmini.mp4" type="video/mp4">
         </video>
-
 
     <button id="interactButton">Interact (E)</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -100,22 +98,31 @@
         // Pictures on walls
 const textureLoader = new THREE.TextureLoader();
 const pictureData = [
-    { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },
+{ position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'carousel', files: ['central.png', '2.gif', '3.jpg'] },
     { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
     { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
     { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
 ];
 
 const videoTextures = [];
-let currentVideoIndex = 0;
+        let carouselIndex = 0;
 
-pictureData.forEach((pic, index) => {
-    let material;
-    
-    if (pic.type === 'image') {
-        const texture = textureLoader.load(`images/${pic.file}`);
-        material = new THREE.MeshBasicMaterial({ map: texture });
-    } else if (pic.type === 'video') {
+        pictureData.forEach((pic, index) => {
+            let material;
+            
+            if (pic.type === 'carousel') {
+                const texture = textureLoader.load(`images/${pic.files[0]}`);
+                material = new THREE.MeshBasicMaterial({ map: texture });
+                
+                // Create a simple carousel
+                setInterval(() => {
+                    carouselIndex = (carouselIndex + 1) % pic.files.length;
+                    textureLoader.load(`images/${pic.files[carouselIndex]}`, (newTexture) => {
+                        material.map = newTexture;
+                        material.needsUpdate = true;
+                    });
+                }, 3000); // Change every 3 seconds
+            } else if (pic.type === 'video') {
         const video = document.getElementById(pic.element);
         videoTextures.push({ video, index });
         const videoTexture = new THREE.VideoTexture(video);
@@ -130,6 +137,8 @@ pictureData.forEach((pic, index) => {
     picture.rotation.set(...pic.rotation);
     scene.add(picture);
 });
+
+
 
 function playNextVideo() {
     if (videoTextures.length === 0) return;
@@ -147,7 +156,20 @@ function playNextVideo() {
 // Start playing the first video
 playNextVideo();
 
+        // Pedestal with papers next to the central image
+        const pedestalGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
+        const pedestalMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+        const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
+        pedestal.position.set(3, 1.5, -9.5);  // Adjust position as needed
+        scene.add(pedestal);
 
+        // Adding papers on top of the pedestal
+        const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
+        const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+        paper.position.set(3, 3, -9.5);
+        paper.rotation.x = -Math.PI / 2;
+        scene.add(paper);
 
         // Rotating objects in corners
         const cornerPositions = [
