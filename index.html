@@ -31,9 +31,9 @@
 </head>
 <body>
     <div id="info">Use arrow keys to move. Click and drag to look around.</div>
-    <video id="gif1" src="images/1.gif" autoplay loop muted style="display:none"></video>
-    <video id="gif2" src="images/2.gif" autoplay loop muted style="display:none"></video>
-    
+    <video id="gif1" src="images/androidmini.mp4" autoplay loop muted style="display:none"></video>
+    <video id="gif2" src="images/Py-GAME.mp4" autoplay loop muted style="display:none"></video>
+    <video id="gif3" src="images/Py-GAME.mp4" autoplay loop muted style="display:none"></video>
 
     <button id="interactButton">Interact (E)</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -93,7 +93,7 @@
             { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },  // Central image (PNG or JPEG)
             { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },  // Left wall (GIF)
             { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },  // Right wall (GIF)
-            { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: '3.jpg' },   // Back wall (GIF)
+            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }  // Back wall (GIF)
         ];
 
         pictureData.forEach((pic) => {
