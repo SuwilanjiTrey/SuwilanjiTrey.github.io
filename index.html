@@ -125,7 +125,7 @@ pictureData.forEach((pic, index) => {
         material = new THREE.MeshBasicMaterial({ map: videoTexture });
     }
     
-    const picture = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), material);
+    const picture = new THREE.Mesh(new THREE.PlaneGeometry(5, 3), material);
     picture.position.set(...pic.position);
     picture.rotation.set(...pic.rotation);
     scene.add(picture);
