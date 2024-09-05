@@ -82,22 +82,24 @@
         scene.add(ceiling);
 
         // Pictures on walls
+        // Pictures on walls
         const textureLoader = new THREE.TextureLoader();
-        const picturePositions = [
-            { position: [0, 5, -9.9], rotation: [0, 0, 0] },
-            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0] },
-            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0] },
-            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0] }
+        const pictureData = [
+            { position: [0, 5, -9.9], rotation: [0, 0, 0], file: 'central.png' },  // Central image (PNG or JPEG)
+            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], file: '1.gif' },  // Left wall (GIF)
+            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], file: '2.gif' },  // Right wall (GIF)
+            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], file: '3.jpg' }  // Back wall (GIF)
         ];
 
-        picturePositions.forEach((pic, index) => {
-            const texture = textureLoader.load(`path/to/your/picture${index + 1}.jpg`);
+        pictureData.forEach((pic) => {
+            const texture = textureLoader.load(`images/${pic.file}`);
             const pictureMaterial = new THREE.MeshBasicMaterial({ map: texture });
             const picture = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), pictureMaterial);
             picture.position.set(...pic.position);
             picture.rotation.set(...pic.rotation);
             scene.add(picture);
         });
+
 
         // Rotating objects in corners
         const cornerPositions = [
@@ -117,7 +119,7 @@
         });
 
         // Camera setup
-        camera.position.set(0, 3, 0);
+        camera.position.set(0, 4, 0);
         camera.lookAt(0, 2, -1);
 
         // Mouse look variables
