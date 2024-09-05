@@ -96,39 +96,55 @@
         scene.add(ceiling);
 
         // Pictures on walls
-        // Pictures on walls
-        const textureLoader = new THREE.TextureLoader();
-        const pictureData = [
-            { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },
-            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
-            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
-            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
-        ];
+const textureLoader = new THREE.TextureLoader();
+const pictureData = [
+    { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },
+    { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
+    { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
+    { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
+];
 
-        const videoTextures = [];
+const videoTextures = [];
+let currentVideoIndex = 0;
 
-        pictureData.forEach((pic) => {
-            let material;
-            
-            if (pic.type === 'image') {
-                const texture = textureLoader.load(`images/${pic.file}`);
-                material = new THREE.MeshBasicMaterial({ map: texture });
-            } else if (pic.type === 'video') {
-                const video = document.getElementById(pic.element);
-                video.play(); // Start playing the video
-                const videoTexture = new THREE.VideoTexture(video);
-                videoTexture.minFilter = THREE.LinearFilter;
-                videoTexture.magFilter = THREE.LinearFilter;
-                videoTexture.format = THREE.RGBFormat;
-                material = new THREE.MeshBasicMaterial({ map: videoTexture });
-                videoTextures.push(videoTexture);
-            }
-            
-            const picture = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), material);
-            picture.position.set(...pic.position);
-            picture.rotation.set(...pic.rotation);
-            scene.add(picture);
-        });
+pictureData.forEach((pic, index) => {
+    let material;
+    
+    if (pic.type === 'image') {
+        const texture = textureLoader.load(`images/${pic.file}`);
+        material = new THREE.MeshBasicMaterial({ map: texture });
+    } else if (pic.type === 'video') {
+        const video = document.getElementById(pic.element);
+        videoTextures.push({ video, index });
+        const videoTexture = new THREE.VideoTexture(video);
+        videoTexture.minFilter = THREE.LinearFilter;
+        videoTexture.magFilter = THREE.LinearFilter;
+        videoTexture.format = THREE.RGBFormat;
+        material = new THREE.MeshBasicMaterial({ map: videoTexture });
+    }
+    
+    const picture = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), material);
+    picture.position.set(...pic.position);
+    picture.rotation.set(...pic.rotation);
+    scene.add(picture);
+});
+
+function playNextVideo() {
+    if (videoTextures.length === 0) return;
+
+    const { video, index } = videoTextures[currentVideoIndex];
+    
+    video.play();
+    video.onended = () => {
+        video.pause(); // Pause the current video
+        currentVideoIndex = (currentVideoIndex + 1) % videoTextures.length; // Move to the next video
+        playNextVideo(); // Play the next video
+    };
+}
+
+// Start playing the first video
+playNextVideo();
+
 
 
         // Rotating objects in corners
