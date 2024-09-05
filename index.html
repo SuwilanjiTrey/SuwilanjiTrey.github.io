@@ -27,13 +27,23 @@
             cursor: pointer;
             display: none;
         }
+        video {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="info">Use arrow keys to move. Click and drag to look around.</div>
-    <video id="gif1" src="images/androidmini.mp4" autoplay loop muted style="display:none"></video>
-    <video id="gif2" src="images/Py-GAME.mp4" autoplay loop muted style="display:none"></video>
-    <video id="gif3" src="images/Py-GAME.mp4" autoplay loop muted style="display:none"></video>
+        <!-- Add video elements -->
+        <video id="gif1" loop muted>
+            <source src="images/androidmini.mp4" type="video/mp4">
+        </video>
+        <video id="gif2" loop muted>
+            <source src="images/Py-GAME.mp4" type="video/mp4">
+        </video>
+        <video id="gif3" loop muted>
+            <source src="images/androidmini.mp4" type="video/mp4">
+        </video>
 
     <button id="interactButton">Interact (E)</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -88,13 +98,14 @@
         // Pictures on walls
         // Pictures on walls
         const textureLoader = new THREE.TextureLoader();
-        // Pictures on walls
         const pictureData = [
-            { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },  // Central image (PNG or JPEG)
-            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },  // Left wall (GIF)
-            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },  // Right wall (GIF)
-            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }  // Back wall (GIF)
+            { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'image', file: 'central.png' },
+            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
+            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
+            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
         ];
+
+        const videoTextures = [];
 
         pictureData.forEach((pic) => {
             let material;
@@ -104,16 +115,20 @@
                 material = new THREE.MeshBasicMaterial({ map: texture });
             } else if (pic.type === 'video') {
                 const video = document.getElementById(pic.element);
+                video.play(); // Start playing the video
                 const videoTexture = new THREE.VideoTexture(video);
+                videoTexture.minFilter = THREE.LinearFilter;
+                videoTexture.magFilter = THREE.LinearFilter;
+                videoTexture.format = THREE.RGBFormat;
                 material = new THREE.MeshBasicMaterial({ map: videoTexture });
+                videoTextures.push(videoTexture);
             }
-
+            
             const picture = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), material);
             picture.position.set(...pic.position);
             picture.rotation.set(...pic.rotation);
             scene.add(picture);
         });
-
 
 
         // Rotating objects in corners
@@ -233,6 +248,12 @@
                 obj.rotation.y += 0.01;
             });
             
+                        // Update video textures
+            videoTextures.forEach(texture => {
+                texture.needsUpdate = true;
+            });
+
+
             // Smooth camera rotation
             camera.rotation.y += (targetRotationY - camera.rotation.y) * 0.1;
             camera.rotation.x += (targetRotationX - camera.rotation.x) * 0.1;
