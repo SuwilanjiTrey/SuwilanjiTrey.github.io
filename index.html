@@ -170,7 +170,7 @@ loader.load('models/table.glb', (gltf) => {
     const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
     const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const paper = new THREE.Mesh(paperGeometry, paperMaterial);
-    paper.position.set(5, 5, -9.9); // Position above the pedestal
+    paper.position.set(5, 7, -9.9); // Position above the pedestal
     paper.rotation.x = -Math.PI / 6; // Slight tilt
     scene.add(paper);
 
