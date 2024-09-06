@@ -112,16 +112,6 @@
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
-    // Ceiling
-    const ceiling = new THREE.Mesh(floorGeometry, ceilingMaterial);
-    ceiling.position.y = 10;
-    ceiling.rotation.x = Math.PI / 2;
-    scene.add(ceiling);
-
-    // Floor
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI / 2;
-    scene.add(floor);
 
         // Pictures on walls
 //const textureLoader = new THREE.TextureLoader();
