@@ -162,8 +162,8 @@ playNextVideo();
 const loader = new THREE.GLTFLoader();
 loader.load('models/table.glb', (gltf) => {
     const pedestal = gltf.scene;
-    pedestal.position.set(0, 0, -9.9); // Position the pedestal near the central image
-    pedestal.scale.set(2, 2, 2); // Adjust scale if necessary
+    pedestal.position.set(5, 0, -9.9); // Position the pedestal near the central image
+    pedestal.scale.set(2, 5, 2); // Adjust scale if necessary
     scene.add(pedestal);
 
     // Create the floating, rotating paper
