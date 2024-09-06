@@ -83,18 +83,26 @@
     const floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture });
 
         // Walls
-// Define the geometry for the walls
-const wallWidth = 20; // Adjust this to your desired width
-const wallHeight = 10; // Adjust this to your desired height
-const wallGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
+        // Define the geometry for the walls
+        const wallWidth = 20; // Adjust this to your desired width
+        const wallHeight = 10; // Adjust this to your desired height
+        const wallGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
 
-// Now use wallGeometry to create the walls
-walls.forEach(wall => {
-    const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
-    wallMesh.position.set(...wall.position);
-    wallMesh.rotation.set(...wall.rotation);
-    scene.add(wallMesh);
-});
+        // Walls
+        const walls = [
+            { position: [0, 5, -10], rotation: [0, 0, 0] },
+            { position: [-10, 5, 0], rotation: [0, Math.PI / 2, 0] },
+            { position: [10, 5, 0], rotation: [0, -Math.PI / 2, 0] },
+            { position: [0, 5, 10], rotation: [0, Math.PI, 0] }
+        ];
+
+        walls.forEach(wall => {
+            const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+            wallMesh.position.set(...wall.position);
+            wallMesh.rotation.set(...wall.rotation);
+            scene.add(wallMesh);
+        });
+
 
     // Ceiling
     const ceiling = new THREE.Mesh(floorGeometry, ceilingMaterial);
