@@ -47,8 +47,9 @@
 
     <button id="interactButton">Interact (E)</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     
+
     <script>
         // Scene setup
         const scene = new THREE.Scene();
@@ -64,44 +65,7 @@
         directionalLight.position.set(1, 1, 1).normalize();
         scene.add(directionalLight);
 
-        // Bottom corner lights
-        const cornerLightPositions = [
-            [-9.5, 0.5, -9.5],
-            [9.5, 0.5, -9.5],
-            [-9.5, 0.5, 9.5],
-            [9.5, 0.5, 9.5]
-        ];
-        cornerLightPositions.forEach(position => {
-            const cornerLight = new THREE.PointLight(0xffa500, 1, 10); // Soft orange glow
-            cornerLight.position.set(...position);
-            scene.add(cornerLight);
-        });
-
-        // LED glowing lights around the ceiling edges
-        const ledLightColor = 0x00ffcc;
-        const ledIntensity = 0.5;
-        const ledDistance = 2;
-        const ledHeight = 9.5;
-        const ledSpacing = 2;
-        
-        for (let i = -9; i <= 9; i += ledSpacing) {
-            const lightFront = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
-            lightFront.position.set(i, ledHeight, -9.5);
-            scene.add(lightFront);
-
-            const lightBack = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
-            lightBack.position.set(i, ledHeight, 9.5);
-            scene.add(lightBack);
-
-            const lightLeft = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
-            lightLeft.position.set(-9.5, ledHeight, i);
-            scene.add(lightLeft);
-
-            const lightRight = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
-            lightRight.position.set(9.5, ledHeight, i);
-            scene.add(lightRight);
-        }
-
+    // Loading textures for patterns
         // Loading textures for patterns
         const textureLoader = new THREE.TextureLoader();
         const wallTexture = textureLoader.load('images/sides.jpeg');
@@ -150,14 +114,15 @@
         scene.add(floor);
 
         // Pictures on walls
-        const pictureData = [
-            { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'carousel', files: ['central.png', '2.gif', '3.jpg'] },
-            { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
-            { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
-            { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
-        ];
+//const textureLoader = new THREE.TextureLoader();
+const pictureData = [
+{ position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'carousel', files: ['central.png', '2.gif', '3.jpg'] },
+    { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
+    { position: [9.9, 5, 0], rotation: [0, -Math.PI / 2, 0], type: 'video', element: 'gif2' },
+    { position: [0, 5, 9.9], rotation: [0, Math.PI, 0], type: 'video', element: 'gif3' }
+];
 
-        const videoTextures = [];
+const videoTextures = [];
         let carouselIndex = 0;
         let currentVideoIndex = 0;
 
@@ -165,227 +130,230 @@
             let material;
             
             if (pic.type === 'carousel') {
-                const texture = textureLoader.load(`images/${pic.files[0]}`);
+                const texture = textureLoader.load(images/${pic.files[0]});
                 material = new THREE.MeshBasicMaterial({ map: texture });
                 
                 // Create a simple carousel
                 setInterval(() => {
                     carouselIndex = (carouselIndex + 1) % pic.files.length;
-                    textureLoader.load(`images/${pic.files[carouselIndex]}`, (newTexture) => {
+                    textureLoader.load(images/${pic.files[carouselIndex]}, (newTexture) => {
                         material.map = newTexture;
                         material.needsUpdate = true;
                     });
                 }, 3000); // Change every 3 seconds
             } else if (pic.type === 'video') {
-                const video = document.getElementById(pic.element);
-                videoTextures.push({ video, index });
-                const videoTexture = new THREE.VideoTexture(video);
-                videoTexture.minFilter = THREE.LinearFilter;
-                videoTexture.magFilter = THREE.LinearFilter;
-                videoTexture.format = THREE.RGBFormat;
-                material = new THREE.MeshBasicMaterial({ map: videoTexture });
-            }
-            
-            const picture = new THREE.Mesh(new THREE.PlaneGeometry(5, 3), material);
-            picture.position.set(...pic.position);
-            picture.rotation.set(...pic.rotation);
-            scene.add(picture);
-        });
+        const video = document.getElementById(pic.element);
+        videoTextures.push({ video, index });
+        const videoTexture = new THREE.VideoTexture(video);
+        videoTexture.minFilter = THREE.LinearFilter;
+        videoTexture.magFilter = THREE.LinearFilter;
+        videoTexture.format = THREE.RGBFormat;
+        material = new THREE.MeshBasicMaterial({ map: videoTexture });
+    }
+    
+    const picture = new THREE.Mesh(new THREE.PlaneGeometry(5, 3), material);
+    picture.position.set(...pic.position);
+    picture.rotation.set(...pic.rotation);
+    scene.add(picture);
+});
 
-        function playNextVideo() {
-            if (videoTextures.length === 0) return;
+function playNextVideo() {
+    if (videoTextures.length === 0) return;
 
-            const { video, index } = videoTextures[currentVideoIndex];
-            
-            video.play();
-            video.onended = () => {
-                video.pause(); // Pause the current video
-                currentVideoIndex = (currentVideoIndex + 1) % videoTextures.length; // Move to the next video
-            playNextVideo(); // Play the next video
-        };
+    const { video, index } = videoTextures[currentVideoIndex];
+    
+    video.play();
+    video.onended = () => {
+        video.pause(); // Pause the current video
+        currentVideoIndex = (currentVideoIndex + 1) % videoTextures.length; // Move to the next video
+        playNextVideo(); // Play the next video
+    };
+}
+
+// Start playing the first video
+playNextVideo();
+
+
+// Load the GLTF model for the pedestal
+const loader = new THREE.GLTFLoader();
+loader.load('models/table.glb', (gltf) => {
+    const pedestal = gltf.scene;
+    pedestal.position.set(5, 0, -9.9); // Position the pedestal near the central image
+    pedestal.scale.set(2, 5, 2); // Adjust scale if necessary
+    scene.add(pedestal);
+
+    // Create the floating, rotating paper
+    const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
+    const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+    paper.position.set(5, 4, -9.9); // Position above the pedestal
+    paper.rotation.x = -Math.PI / 6; // Slight tilt
+    scene.add(paper);
+
+    // Rotate the paper over time
+    function rotatePaper() {
+        paper.rotation.y += 0.01; // Adjust the rotation speed
     }
 
-    // Start playing the first video
-    playNextVideo();
+    // Update the animate function to include the rotation
+    function animate() {
+        requestAnimationFrame(animate);
+        rotatePaper(); // Add this line
+        renderer.render(scene, camera);
+    }
 
-    // Load the GLTF model for the pedestal
-    const loader = new THREE.GLTFLoader();
-    loader.load('models/table.glb', (gltf) => {
-        const pedestal = gltf.scene;
-        pedestal.position.set(5, 0, -9.9); // Position the pedestal near the central image
-        pedestal.scale.set(2, 5, 2); // Adjust scale if necessary
-        scene.add(pedestal);
+    animate();
+});
 
-        // Create the floating, rotating paper
-        const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
-        const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const paper = new THREE.Mesh(paperGeometry, paperMaterial);
-        paper.position.set(5, 4, -9.9); // Position above the pedestal
-        paper.rotation.x = -Math.PI / 6; // Slight tilt
-        scene.add(paper);
+//const gltfLoader = new THREE.GLTFLoader();
 
-        // Rotate the paper over time
-        function rotatePaper() {
-            paper.rotation.y += 0.01; // Adjust the rotation speed
+//gltfLoader.load('models/chandelier.glb', (gltf) => {
+    //const chandelier = gltf.scene;
+    //chandelier.position.set(0, 9, 0); // Positioning the chandelier near the ceiling
+    //chandelier.scale.set(0.5, 0.5, 0.5); // Adjust the scale as needed
+    //scene.add(chandelier);
+//});
+
+
+        // Rotating objects in corners
+        const cornerPositions = [
+            [-9, 1, -9],
+            [9, 1, -9],
+            [-9, 1, 9],
+            [9, 1, 9]
+        ];
+
+        const rotatingObjects = cornerPositions.map((position, index) => {
+            const geometry = index % 2 === 0 ? new THREE.BoxGeometry(1, 1, 1) : new THREE.TetrahedronGeometry(0.7);
+            const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
+            const object = new THREE.Mesh(geometry, material);
+            object.position.set(...position);
+            scene.add(object);
+            return object;
+        });
+
+        // Camera setup
+        camera.position.set(0, 4, 0);
+        camera.lookAt(0, 2, -1);
+
+        // Mouse look variables
+        let isMouseDown = false;
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        const sensitivity = 0.002;
+
+        // Interactivity
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let intersectedObject = null;
+
+        function checkIntersections() {
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects([...rotatingObjects, ...scene.children]);
+            
+            if (intersects.length > 0) {
+                intersectedObject = intersects[0].object;
+                document.getElementById('interactButton').style.display = 'block';
+            } else {
+                intersectedObject = null;
+                document.getElementById('interactButton').style.display = 'none';
+            }
         }
 
-        // Update the animate function to include the rotation
+        function interact() {
+            if (intersectedObject) {
+                alert(You interacted with an object at position (${intersectedObject.position.x.toFixed(2)}, ${intersectedObject.position.y.toFixed(2)}, ${intersectedObject.position.z.toFixed(2)}));
+            }
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const speed = 0.5;
+            switch(event.code) {
+                case 'ArrowUp':
+                    camera.position.z -= Math.cos(camera.rotation.y) * speed;
+                    camera.position.x -= Math.sin(camera.rotation.y) * speed;
+                    break;
+                case 'ArrowDown':
+                    camera.position.z += Math.cos(camera.rotation.y) * speed;
+                    camera.position.x += Math.sin(camera.rotation.y) * speed;
+                    break;
+                case 'ArrowLeft':
+                    camera.position.x -= Math.cos(camera.rotation.y) * speed;
+                    camera.position.z += Math.sin(camera.rotation.y) * speed;
+                    break;
+                case 'ArrowRight':
+                    camera.position.x += Math.cos(camera.rotation.y) * speed;
+                    camera.position.z -= Math.sin(camera.rotation.y) * speed;
+                    break;
+                case 'KeyE':
+                    interact();
+                    break;
+            }
+        });
+
+        document.getElementById('interactButton').addEventListener('click', interact);
+
+        // Mouse events for looking around
+        document.addEventListener('mousedown', (event) => {
+            isMouseDown = true;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isMouseDown = false;
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            if (isMouseDown) {
+                const deltaX = event.clientX - mouseX;
+                const deltaY = event.clientY - mouseY;
+
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+
+                targetRotationY -= deltaX * sensitivity;
+                targetRotationX -= deltaY * sensitivity;
+
+                // Limit vertical rotation
+                targetRotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, targetRotationX));
+            }
+        });
+
+        // Animation
         function animate() {
             requestAnimationFrame(animate);
-            rotatePaper(); // Add this line
+            
+            // Rotate corner objects
+            rotatingObjects.forEach(obj => {
+                obj.rotation.x += 0.01;
+                obj.rotation.y += 0.01;
+            });
+            
+                        // Update video textures
+            videoTextures.forEach(texture => {
+                texture.needsUpdate = true;
+            });
+
+
+            // Smooth camera rotation
+            camera.rotation.y += (targetRotationY - camera.rotation.y) * 0.1;
+            camera.rotation.x += (targetRotationX - camera.rotation.x) * 0.1;
+            
+            checkIntersections();
             renderer.render(scene, camera);
         }
 
         animate();
-    });
 
-    // Add the chandelier model
-    loader.load('models/chandelier.glb', (gltf) => {
-        const chandelier = gltf.scene;
-        chandelier.position.set(0, 9, 0); // Positioning the chandelier near the ceiling
-        chandelier.scale.set(0.5, 0.5, 0.5); // Adjust the scale as needed
-        scene.add(chandelier);
-    });
-
-    // Rotating objects in corners
-    const cornerPositions = [
-        [-9, 1, -9],
-        [9, 1, -9],
-        [-9, 1, 9],
-        [9, 1, 9]
-    ];
-
-    const rotatingObjects = cornerPositions.map(position => {
-        const geometry = new THREE.BoxGeometry(1, 1, 1); // Example geometry, could be any shape
-        const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 }); // Example material
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(...position);
-        scene.add(mesh);
-        return mesh;
-    });
-
-    // Animation loop
-    function animate() {
-        rotatingObjects.forEach(obj => {
-            obj.rotation.x += 0.01;
-            obj.rotation.y += 0.01;
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    // Camera control
-    let moveForward = false;
-    let moveBackward = false;
-    let moveLeft = false;
-    let moveRight = false;
-
-    document.addEventListener('keydown', (event) => {
-        switch (event.code) {
-            case 'ArrowUp':
-            case 'KeyW':
-                moveForward = true;
-                break;
-            case 'ArrowLeft':
-            case 'KeyA':
-                moveLeft = true;
-                break;
-            case 'ArrowDown':
-            case 'KeyS':
-                moveBackward = true;
-                break;
-            case 'ArrowRight':
-            case 'KeyD':
-                moveRight = true;
-                break;
-        }
-    });
-
-    document.addEventListener('keyup', (event) => {
-        switch (event.code) {
-            case 'ArrowUp':
-            case 'KeyW':
-                moveForward = false;
-                break;
-            case 'ArrowLeft':
-            case 'KeyA':
-                moveLeft = false;
-                break;
-            case 'ArrowDown':
-            case 'KeyS':
-                moveBackward = false;
-                break;
-            case 'ArrowRight':
-            case 'KeyD':
-                moveRight = false;
-                break;
-        }
-    });
-
-    const velocity = new THREE.Vector3();
-
-    function updateMovement() {
-        if (moveForward) velocity.z -= 0.1;
-        if (moveBackward) velocity.z += 0.1;
-        if (moveLeft) velocity.x -= 0.1;
-        if (moveRight) velocity.x += 0.1;
-
-        camera.position.add(velocity);
-        velocity.multiplyScalar(0.9); // Damping effect
-    }
-
-    function update() {
-        updateMovement();
-        requestAnimationFrame(update);
-    }
-
-    update();
-
-    // Mouse look
-    let isDragging = false;
-    let previousMousePosition = {
-        x: 0,
-        y: 0
-    };
-
-    document.addEventListener('mousedown', (e) => {
-        isDragging = true;
-    });
-
-    document.addEventListener('mouseup', (e) => {
-        isDragging = false;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            const deltaMove = {
-                x: e.offsetX - previousMousePosition.x,
-                y: e.offsetY - previousMousePosition.y
-            };
-
-            const deltaRotationQuaternion = new THREE.Quaternion()
-                .setFromEuler(new THREE.Euler(
-                    toRadians(deltaMove.y * 0.5),
-                    toRadians(deltaMove.x * 0.5),
-                    0,
-                    'XYZ'
-                ));
-
-            camera.quaternion.multiplyQuaternions(deltaRotationQuaternion, camera.quaternion);
-
-            previousMousePosition = {
-                x: e.offsetX,
-                y: e.offsetY
-            };
-        }
-    });
-
-    function toRadians(angle) {
-        return angle * (Math.PI / 180);
-    }
-</script>
-
+    </script>
 </body>
 </html>
