@@ -51,19 +51,64 @@
     
 
     <script>
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+// Existing Scene Setup (no changes made)
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(1, 1, 1).normalize();
-        scene.add(directionalLight);
+// Existing Lighting (no changes made)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(1, 1, 1).normalize();
+scene.add(directionalLight);
+
+// Adding LED Glowing Lights around the Ceiling Edges
+const ledLightColor = 0x00ffcc;
+const ledIntensity = 0.5;
+const ledDistance = 2;
+const ledHeight = 9.5;
+const ledSpacing = 2;
+
+for (let i = -9; i <= 9; i += ledSpacing) {
+    const lightFront = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
+    lightFront.position.set(i, ledHeight, -9.5);
+    scene.add(lightFront);
+
+    const lightBack = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
+    lightBack.position.set(i, ledHeight, 9.5);
+    scene.add(lightBack);
+
+    const lightLeft = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
+    lightLeft.position.set(-9.5, ledHeight, i);
+    scene.add(lightLeft);
+
+    const lightRight = new THREE.PointLight(ledLightColor, ledIntensity, ledDistance);
+    lightRight.position.set(9.5, ledHeight, i);
+    scene.add(lightRight);
+}
+
+// Adding Bottom Corner Lights
+const cornerLightColor = 0xffa500; // Soft orange glow
+const cornerLightIntensity = 1;
+const cornerLightDistance = 10;
+const cornerLightPositions = [
+    [-9.5, 0.5, -9.5],
+    [9.5, 0.5, -9.5],
+    [-9.5, 0.5, 9.5],
+    [9.5, 0.5, 9.5]
+];
+
+cornerLightPositions.forEach(position => {
+    const cornerLight = new THREE.PointLight(cornerLightColor, cornerLightIntensity, cornerLightDistance);
+    cornerLight.position.set(...position);
+    scene.add(cornerLight);
+});
+
+// Continue with the rest of your existing code...
+
 
     // Loading textures for patterns
         // Loading textures for patterns
