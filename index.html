@@ -175,13 +175,13 @@ const videoTextures = [];
             let material;
             
             if (pic.type === 'carousel') {
-                const texture = textureLoader.load(images/${pic.files[0]});
+                const texture = textureLoader.load(`images/${pic.files[0]}`);
                 material = new THREE.MeshBasicMaterial({ map: texture });
                 
                 // Create a simple carousel
                 setInterval(() => {
                     carouselIndex = (carouselIndex + 1) % pic.files.length;
-                    textureLoader.load(images/${pic.files[carouselIndex]}, (newTexture) => {
+                    textureLoader.load(`images/${pic.files[carouselIndex]}`, (newTexture) => {
                         material.map = newTexture;
                         material.needsUpdate = true;
                     });
@@ -309,7 +309,7 @@ loader.load('models/table.glb', (gltf) => {
 
         function interact() {
             if (intersectedObject) {
-                alert(You interacted with an object at position (${intersectedObject.position.x.toFixed(2)}, ${intersectedObject.position.y.toFixed(2)}, ${intersectedObject.position.z.toFixed(2)}));
+                alert(`You interacted with an object at position (${intersectedObject.position.x.toFixed(2)}, ${intersectedObject.position.y.toFixed(2)}, ${intersectedObject.position.z.toFixed(2)})`);
             }
         }
 
