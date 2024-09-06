@@ -66,6 +66,7 @@
         scene.add(directionalLight);
 
     // Loading textures for patterns
+    const textureLoader = new THREE.TextureLoader();
     // Loading textures for patterns
     const wallTexture = textureLoader.load('images/sides.jpeg');
     const ceilingTexture = textureLoader.load('images/ceiling.jpeg');
@@ -109,7 +110,7 @@
     scene.add(floor);
 
         // Pictures on walls
-const textureLoader = new THREE.TextureLoader();
+//const textureLoader = new THREE.TextureLoader();
 const pictureData = [
 { position: [0, 5, -9.9], rotation: [0, 0, 0], type: 'carousel', files: ['central.png', '2.gif', '3.jpg'] },
     { position: [-9.9, 5, 0], rotation: [0, Math.PI / 2, 0], type: 'video', element: 'gif1' },
