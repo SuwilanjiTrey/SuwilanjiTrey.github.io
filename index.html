@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suwilanji Trey Chellah</title>
+    <title>Interactive Museum Portfolio</title>
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
@@ -156,20 +156,37 @@ function playNextVideo() {
 playNextVideo();
 
 
-        // Pedestal with papers next to the central image
-        const pedestalGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
-        const pedestalMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
-        const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
-        pedestal.position.set(3, 1.5, -9.5);  // Adjust position as needed
-        scene.add(pedestal);
+// Load the GLTF model for the pedestal
+const loader = new THREE.GLTFLoader();
+loader.load('models/table.glb', (gltf) => {
+    const pedestal = gltf.scene;
+    pedestal.position.set(0, 0, -9.9); // Position the pedestal near the central image
+    pedestal.scale.set(2, 2, 2); // Adjust scale if necessary
+    scene.add(pedestal);
 
-        // Adding papers on top of the pedestal
-        const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
-        const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const paper = new THREE.Mesh(paperGeometry, paperMaterial);
-        paper.position.set(3, 3, -9.5);
-        paper.rotation.x = -Math.PI / 2;
-        scene.add(paper);
+    // Create the floating, rotating paper
+    const paperGeometry = new THREE.PlaneGeometry(1, 1.5);
+    const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+    paper.position.set(0, 2, -9.9); // Position above the pedestal
+    paper.rotation.x = -Math.PI / 6; // Slight tilt
+    scene.add(paper);
+
+    // Rotate the paper over time
+    function rotatePaper() {
+        paper.rotation.y += 0.01; // Adjust the rotation speed
+    }
+
+    // Update the animate function to include the rotation
+    function animate() {
+        requestAnimationFrame(animate);
+        rotatePaper(); // Add this line
+        renderer.render(scene, camera);
+    }
+
+    animate();
+});
+
 
 
         // Rotating objects in corners
