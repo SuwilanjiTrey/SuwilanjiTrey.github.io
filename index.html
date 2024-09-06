@@ -65,11 +65,19 @@
         directionalLight.position.set(1, 1, 1).normalize();
         scene.add(directionalLight);
 
-        // Museum room (walls, floor, ceiling)
-        const wallMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
-        const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
-        const wallGeometry = new THREE.PlaneGeometry(20, 10);
-        const floorGeometry = new THREE.PlaneGeometry(20, 20);
+    // Loading textures for patterns
+    const wallTexture = textureLoader.load('textures/wall-pattern.jpg');
+    const ceilingTexture = textureLoader.load('textures/ceiling-pattern.jpg');
+    const floorTexture = textureLoader.load('textures/floor-pattern.jpg');
+
+    // Applying the wall pattern texture
+    const wallMaterial = new THREE.MeshPhongMaterial({ map: wallTexture });
+
+    // Applying the ceiling pattern texture
+    const ceilingMaterial = new THREE.MeshPhongMaterial({ map: ceilingTexture });
+
+    // Applying the floor pattern texture
+    const floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture });
 
         // Walls
         const walls = [
@@ -79,23 +87,24 @@
             { position: [0, 5, 10], rotation: [0, Math.PI, 0] }
         ];
 
-        walls.forEach(wall => {
-            const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
-            wallMesh.position.set(...wall.position);
-            wallMesh.rotation.set(...wall.rotation);
-            scene.add(wallMesh);
-        });
+    // Walls
+    walls.forEach(wall => {
+        const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+        wallMesh.position.set(...wall.position);
+        wallMesh.rotation.set(...wall.rotation);
+        scene.add(wallMesh);
+    });
 
-        // Floor
-        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.rotation.x = -Math.PI / 2;
-        scene.add(floor);
+    // Ceiling
+    const ceiling = new THREE.Mesh(floorGeometry, ceilingMaterial);
+    ceiling.position.y = 10;
+    ceiling.rotation.x = Math.PI / 2;
+    scene.add(ceiling);
 
-        // Ceiling
-        const ceiling = new THREE.Mesh(floorGeometry, wallMaterial);
-        ceiling.position.y = 10;
-        ceiling.rotation.x = Math.PI / 2;
-        scene.add(ceiling);
+    // Floor
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    scene.add(floor);
 
         // Pictures on walls
 const textureLoader = new THREE.TextureLoader();
@@ -189,6 +198,14 @@ loader.load('models/table.glb', (gltf) => {
     animate();
 });
 
+const gltfLoader = new THREE.GLTFLoader();
+
+gltfLoader.load('models/chandelier.glb', (gltf) => {
+    const chandelier = gltf.scene;
+    chandelier.position.set(0, 9, 0); // Positioning the chandelier near the ceiling
+    chandelier.scale.set(0.5, 0.5, 0.5); // Adjust the scale as needed
+    scene.add(chandelier);
+});
 
 
         // Rotating objects in corners
